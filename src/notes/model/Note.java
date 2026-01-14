@@ -1,7 +1,11 @@
 package notes.model;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import notes.utils.DateUtils;
+import notes.utils.StringUtils;
 
 public class Note {
     private int id;
@@ -12,9 +16,14 @@ public class Note {
 
     public Note(int id, String title, String content, String createdAt, List<String> tags) {
         this.id = id;
-        this.title = title;
+        this.title = StringUtils.normalizeTitle(title);
         this.content = content;
-        this.createdAt = createdAt;
+        if (DateUtils.isValidDateTime(createdAt)){
+            this.createdAt = createdAt;
+        } else {
+            this.createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-DD HH:mm"));
+        }
+        
         this.tags = new ArrayList<>(tags);
     }
 
@@ -64,9 +73,9 @@ public class Note {
     }
     
     public void addTag(String tag) {
-        if (!tags.contains(tag)) {
-            tags.add(tag);
-        }
+        String normalizedTag = tag.trim().toLowerCase();
+        tags.add(normalizedTag);
+        
     }
 
     public boolean removeTag(String tag) {
